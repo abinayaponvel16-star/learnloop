@@ -1,0 +1,208 @@
+{
+  "info": {
+    "name": "LearnLoop API",
+    "description": "Postman collection for the LearnLoop mentorship and skill-sharing backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
+    { "key": "token", "value": "" },
+    { "key": "mentorId", "value": "" },
+    { "key": "mentorshipId", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "resourceId", "value": "" },
+    { "key": "ratingId", "value": "" },
+    { "key": "notificationId", "value": "" },
+    { "key": "skillId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"LearnLoop User\",\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123\",\n  \"role\": \"learner\",\n  \"skillsToLearn\": [\"React\"]\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) pm.collectionVariables.set('token', json.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        { "name": "Me", "request": { "method": "GET", "url": "{{baseUrl}}/auth/me" } },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"bio\": \"Building and learning in public.\",\n  \"languages\": [\"English\", \"Hindi\"]\n}" },
+            "url": "{{baseUrl}}/auth/profile"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"Password123\",\n  \"newPassword\": \"Password1234\"\n}" },
+            "url": "{{baseUrl}}/auth/change-password"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mentorships",
+      "item": [
+        {
+          "name": "Request Mentorship",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mentor\": \"{{mentorId}}\",\n  \"skill\": \"React\",\n  \"skillLevelRequired\": \"intermediate\",\n  \"requestMessage\": \"I need help improving component design.\"\n}" },
+            "url": "{{baseUrl}}/mentorships/request"
+          }
+        },
+        { "name": "List Mentorships", "request": { "method": "GET", "url": "{{baseUrl}}/mentorships?page=1&limit=10" } },
+        { "name": "Get Mentorship", "request": { "method": "GET", "url": "{{baseUrl}}/mentorships/{{mentorshipId}}" } },
+        {
+          "name": "Accept Mentorship",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"topic\": \"React architecture\",\n  \"scheduledTime\": \"2026-07-01T10:00:00.000Z\",\n  \"duration\": 60,\n  \"meetingPlatform\": \"google-meet\",\n  \"meetingLink\": \"https://meet.google.com/example\"\n}" },
+            "url": "{{baseUrl}}/mentorships/{{mentorshipId}}/accept"
+          }
+        },
+        {
+          "name": "Reject Mentorship",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"rejectionReason\": \"Schedule is full this week.\"\n}" },
+            "url": "{{baseUrl}}/mentorships/{{mentorshipId}}/reject"
+          }
+        },
+        { "name": "Complete Mentorship", "request": { "method": "PUT", "url": "{{baseUrl}}/mentorships/{{mentorshipId}}/complete" } }
+      ]
+    },
+    {
+      "name": "Sessions",
+      "item": [
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mentor\": \"{{mentorId}}\",\n  \"learner\": \"\",\n  \"topic\": \"Node.js APIs\",\n  \"scheduledTime\": \"2026-07-02T11:00:00.000Z\",\n  \"duration\": 60,\n  \"meetingPlatform\": \"zoom\"\n}" },
+            "url": "{{baseUrl}}/sessions"
+          }
+        },
+        { "name": "List Sessions", "request": { "method": "GET", "url": "{{baseUrl}}/sessions?page=1&limit=10" } },
+        { "name": "Get Session", "request": { "method": "GET", "url": "{{baseUrl}}/sessions/{{sessionId}}" } },
+        { "name": "Start Session", "request": { "method": "PUT", "url": "{{baseUrl}}/sessions/{{sessionId}}/start" } },
+        { "name": "End Session", "request": { "method": "PUT", "url": "{{baseUrl}}/sessions/{{sessionId}}/end" } },
+        { "name": "Delete Session", "request": { "method": "DELETE", "url": "{{baseUrl}}/sessions/{{sessionId}}" } }
+      ]
+    },
+    {
+      "name": "Resources",
+      "item": [
+        {
+          "name": "Upload Link Resource",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"React Docs\",\n  \"description\": \"Official React documentation.\",\n  \"fileUrl\": \"https://react.dev\",\n  \"fileType\": \"link\",\n  \"visibility\": \"public\",\n  \"tags\": [\"react\", \"frontend\"]\n}" },
+            "url": "{{baseUrl}}/resources/upload"
+          }
+        },
+        { "name": "List Resources", "request": { "method": "GET", "url": "{{baseUrl}}/resources?page=1&limit=10&search=react" } },
+        { "name": "Get Resource", "request": { "method": "GET", "url": "{{baseUrl}}/resources/{{resourceId}}" } },
+        { "name": "Count Download", "request": { "method": "PATCH", "url": "{{baseUrl}}/resources/{{resourceId}}/download" } },
+        { "name": "Delete Resource", "request": { "method": "DELETE", "url": "{{baseUrl}}/resources/{{resourceId}}" } }
+      ]
+    },
+    {
+      "name": "Ratings",
+      "item": [
+        {
+          "name": "Create Rating",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"toUser\": \"{{mentorId}}\",\n  \"stars\": 5,\n  \"communication\": 5,\n  \"teachingQuality\": 5,\n  \"knowledgeLevel\": 5,\n  \"helpfulness\": 5,\n  \"feedback\": \"Very helpful session.\"\n}" },
+            "url": "{{baseUrl}}/ratings"
+          }
+        },
+        { "name": "List Ratings", "request": { "method": "GET", "url": "{{baseUrl}}/ratings?page=1&limit=10" } },
+        { "name": "Get Rating", "request": { "method": "GET", "url": "{{baseUrl}}/ratings/{{ratingId}}" } }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        { "name": "List Notifications", "request": { "method": "GET", "url": "{{baseUrl}}/notifications?page=1&limit=10" } },
+        { "name": "Mark Read", "request": { "method": "PATCH", "url": "{{baseUrl}}/notifications/{{notificationId}}/read" } }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        { "name": "Dashboard", "request": { "method": "GET", "url": "{{baseUrl}}/admin/dashboard" } },
+        { "name": "Users", "request": { "method": "GET", "url": "{{baseUrl}}/admin/users?page=1&limit=10" } },
+        { "name": "Sessions", "request": { "method": "GET", "url": "{{baseUrl}}/admin/sessions?page=1&limit=10" } },
+        { "name": "Ratings", "request": { "method": "GET", "url": "{{baseUrl}}/admin/ratings?page=1&limit=10" } },
+        { "name": "Resources", "request": { "method": "GET", "url": "{{baseUrl}}/admin/resources?page=1&limit=10" } },
+        { "name": "Skills", "request": { "method": "GET", "url": "{{baseUrl}}/admin/skills?page=1&limit=10" } },
+        {
+          "name": "Create Skill",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"React\",\n  \"category\": \"Frontend\",\n  \"description\": \"UI library for building interfaces.\"\n}" },
+            "url": "{{baseUrl}}/admin/skills"
+          }
+        },
+        {
+          "name": "Update Skill",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"React.js\",\n  \"category\": \"Frontend\",\n  \"description\": \"Component-based UI library.\",\n  \"isActive\": true\n}" },
+            "url": "{{baseUrl}}/admin/skills/{{skillId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
